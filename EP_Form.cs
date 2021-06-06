@@ -82,8 +82,6 @@ namespace EP
             this.frameGL.OpenGLDraw += Draw;
         }
 
-        #endregion
-
 
         private void InitTextures()
         {
@@ -95,6 +93,9 @@ namespace EP
             textures[5].Create(gl, new Bitmap(Image.FromFile($"Images/Textures/posy.jpg"), new Size(512, 512)));
             textures[6].Create(gl, new Bitmap(Image.FromFile($"Images/Textures/posz.jpg"), new Size(512, 512)));
         }
+
+        #endregion
+
 
 
         #region Drawing
@@ -202,6 +203,8 @@ namespace EP
 
 
 
+        #region Values conversion
+
         private float[] UVD2XYZ(float u, float v, float d)
         {
             var xyz = new float[3];
@@ -219,8 +222,13 @@ namespace EP
             xyz[2] *= (float)Math.Cos(Math.PI);
 
             return xyz;
-        }
+        } 
 
+        #endregion
+
+
+
+        #region Texture binding
 
         private void BindTextures()
         {
@@ -293,7 +301,9 @@ namespace EP
                 gl.TexCoord(0.0f, 1.0f); gl.Vertex(skyBoxSize, -skyBoxSize, skyBoxSize);
             }
             gl.End();
-        }
+        } 
+
+        #endregion
 
 
 

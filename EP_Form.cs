@@ -23,14 +23,19 @@ namespace EP
 
         private readonly Bitmap coloredImage, depthMap;
 
+        private readonly List<float[]> points;
+
         private PointF delta, angle, initPoint;
 
         private Color color;
 
-        private readonly float angleDelta, scale, cubeSize;
-        private float distance;
+        private readonly float angleDelta, scale,
+                               skyBoxSize, cubeSize;
+        private float distance, cubesMoveDelta, 
+                      cubesRotationDelta;
 
-        private readonly int imageIndex, pointSize;
+        private readonly int imageIndex, pointSize,
+                             cubesAmount;
         private int threshMin, threshMax, depth;
 
         public EP_Form()
@@ -45,11 +50,14 @@ namespace EP
 
             imageIndex = 7;
             pointSize = 2;
+            cubesAmount = 6;
 
             depthMap = new Bitmap(Image.FromFile($"Images/bmps/{imageIndex}_Map.bmp"));
             coloredImage = new Bitmap(
                 Image.FromFile($"Images/bmps/{imageIndex}_Color.bmp"),
                 new Size(depthMap.Width, depthMap.Height));
+
+            points = new List<float[]>();
 
             delta = new PointF(0.0f, 0.0f);
             angle = new PointF(0.0f, 0.0f);
@@ -57,7 +65,9 @@ namespace EP
             angleDelta = 0.02f;
             distance = 6.0f;
             scale = 100.0f;
-            cubeSize = 50.0f;
+            skyBoxSize = 50.0f;
+            cubeSize = 0.1f;
+            cubesMoveDelta = cubesRotationDelta = 0.0f;
 
             InitTextures();
         }
@@ -92,6 +102,8 @@ namespace EP
         private void Draw(object sender, RenderEventArgs args)
         {
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+
+            gl.MatrixMode(OpenGL.GL_MODELVIEW);
             gl.LoadIdentity();
 
             threshMin = (int)numMin.Value;
@@ -99,16 +111,13 @@ namespace EP
 
             gl.Translate(delta.X, delta.Y, -distance);
             gl.Rotate(angle.Y, angle.X, 0.0f);
-
             gl.Enable(OpenGL.GL_DEPTH_TEST);
             gl.Enable(OpenGL.GL_ALPHA_TEST);
 
-            gl.PushMatrix();
             gl.Color(1.0f, 1.0f, 1.0f, 1.0f);
             gl.Enable(OpenGL.GL_TEXTURE_2D);
             BindTextures();
             gl.Disable(OpenGL.GL_TEXTURE_2D);
-            gl.PopMatrix();
 
             gl.Translate(0.0f, 0.0f, -100.0f);
             gl.PointSize(pointSize);
@@ -117,8 +126,8 @@ namespace EP
                 gl.Color(1.0f, 1.0f, 1.0f);
                 gl.Vertex(0.0f, 0.0f, 0.0f);
 
-                for (int x = 0; x < coloredImage.Width; x+=pointSize)
-                    for (int y = 0; y < coloredImage.Height; y+=pointSize)
+                for (int x = 0; x < coloredImage.Width; x += pointSize)
+                    for (int y = 0; y < coloredImage.Height; y += pointSize)
                     {
                         color = coloredImage.GetPixel(x, y);
                         depth = (int)depthMap.GetPixel(x, y).R;
@@ -126,12 +135,67 @@ namespace EP
                         if (depth <= threshMin || depth >= threshMax)
                             continue;
 
-                        var p = UVD2XYZ(x,y,depth);
+                        var p = UVD2XYZ(x, y, depth);
 
                         gl.Color(color.R, color.G, color.B);
                         gl.Vertex(p[0] / scale, p[1] / scale, scale - p[2] / scale);
+                        points.Add(p);
                     }
             }
+            gl.End();
+
+            var centreX = points.Average(p => p[0]) / scale;
+            var centreY = points.Average(p => p[1]) / scale;
+            var centreZ = scale - points.Average(p => p[2]) / scale;
+
+            gl.Color(1.0f, 0.0f, 1.0f, 1.0f);
+            gl.Translate(centreX, centreY, centreZ + 0.5f);
+            gl.Rotate(0.0f, 0.0f, cubesRotationDelta);
+            gl.Begin(OpenGL.GL_QUADS);
+            {
+                for (int k = 0; k < cubesAmount; k++)
+                {
+                    gl.Rotate(1.0f, 1.0f, 20.0f);
+                    var xOffset = 0.7f * Math.Sin(360 / cubesAmount * k * Math.PI / 180 + cubesMoveDelta);
+                    var yOffset = 0.7f * Math.Cos(360 / cubesAmount * k * Math.PI / 180 + cubesMoveDelta);
+
+                    gl.Vertex(xOffset - cubeSize, yOffset - cubeSize, -cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset - cubeSize, -cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset - cubeSize, cubeSize);
+                    gl.Vertex(xOffset - cubeSize, yOffset - cubeSize, cubeSize);
+
+                    gl.Vertex(xOffset - cubeSize, yOffset + cubeSize, -cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset + cubeSize, -cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset + cubeSize, cubeSize);
+                    gl.Vertex(xOffset - cubeSize, yOffset + cubeSize, cubeSize);
+
+                    gl.Vertex(xOffset - cubeSize, yOffset - cubeSize, -cubeSize);
+                    gl.Vertex(xOffset - cubeSize, yOffset - cubeSize, cubeSize);
+                    gl.Vertex(xOffset - cubeSize, yOffset + cubeSize, cubeSize);
+                    gl.Vertex(xOffset - cubeSize, yOffset + cubeSize, -cubeSize);
+
+                    gl.Vertex(xOffset + cubeSize, yOffset - cubeSize, -cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset - cubeSize, cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset + cubeSize, cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset + cubeSize, -cubeSize);
+
+                    gl.Vertex(xOffset - cubeSize, yOffset - cubeSize, -cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset - cubeSize, -cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset + cubeSize, -cubeSize);
+                    gl.Vertex(xOffset - cubeSize, yOffset + cubeSize, -cubeSize);
+
+                    gl.Vertex(xOffset - cubeSize, yOffset - cubeSize, cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset - cubeSize, cubeSize);
+                    gl.Vertex(xOffset + cubeSize, yOffset + cubeSize, cubeSize);
+                    gl.Vertex(xOffset - cubeSize, yOffset + cubeSize, cubeSize);
+                }
+            }
+            gl.End();
+
+            gl.Flush();
+
+            cubesMoveDelta += 0.0125f;
+            cubesRotationDelta += 2.0f;
         }
 
         #endregion
@@ -163,70 +227,70 @@ namespace EP
             textures[0].Bind(gl);
             gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
             {
-                gl.TexCoord(0.0f, 0.0f); gl.Vertex(-cubeSize, cubeSize, cubeSize);
-                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-cubeSize, cubeSize, -cubeSize);
-                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-cubeSize, -cubeSize, -cubeSize);
-                gl.TexCoord(0.0f, 1.0f); gl.Vertex(-cubeSize, -cubeSize, cubeSize);
+                gl.TexCoord(0.0f, 0.0f); gl.Vertex(-skyBoxSize, skyBoxSize, skyBoxSize);
+                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-skyBoxSize, skyBoxSize, -skyBoxSize);
+                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-skyBoxSize, -skyBoxSize, -skyBoxSize);
+                gl.TexCoord(0.0f, 1.0f); gl.Vertex(-skyBoxSize, -skyBoxSize, skyBoxSize);
             }
             gl.End();
 
             textures[1].Bind(gl);
             gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
             {
-                gl.TexCoord(0.0f, 0.0f); gl.Vertex(-cubeSize, cubeSize, cubeSize);
-                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-cubeSize, cubeSize, -cubeSize);
-                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-cubeSize, -cubeSize, -cubeSize);
-                gl.TexCoord(0.0f, 1.0f); gl.Vertex(-cubeSize, -cubeSize, cubeSize);
+                gl.TexCoord(0.0f, 0.0f); gl.Vertex(-skyBoxSize, skyBoxSize, skyBoxSize);
+                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-skyBoxSize, skyBoxSize, -skyBoxSize);
+                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-skyBoxSize, -skyBoxSize, -skyBoxSize);
+                gl.TexCoord(0.0f, 1.0f); gl.Vertex(-skyBoxSize, -skyBoxSize, skyBoxSize);
             }
             gl.End();
 
             textures[2].Bind(gl);
             gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
             {
-                gl.TexCoord(0.0f, 0.0f); gl.Vertex(cubeSize, -cubeSize, cubeSize);
-                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-cubeSize, -cubeSize, cubeSize);
-                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-cubeSize, -cubeSize, -cubeSize);
-                gl.TexCoord(0.0f, 1.0f); gl.Vertex(cubeSize, -cubeSize, -cubeSize);
+                gl.TexCoord(0.0f, 0.0f); gl.Vertex(skyBoxSize, -skyBoxSize, skyBoxSize);
+                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-skyBoxSize, -skyBoxSize, skyBoxSize);
+                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-skyBoxSize, -skyBoxSize, -skyBoxSize);
+                gl.TexCoord(0.0f, 1.0f); gl.Vertex(skyBoxSize, -skyBoxSize, -skyBoxSize);
             }
             gl.End();
 
             textures[3].Bind(gl);
             gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
             {
-                gl.TexCoord(0.0f, 0.0f); gl.Vertex(-cubeSize, cubeSize, -cubeSize);
-                gl.TexCoord(1.0f, 0.0f); gl.Vertex(cubeSize, cubeSize, -cubeSize);
-                gl.TexCoord(1.0f, 1.0f); gl.Vertex(cubeSize, -cubeSize, -cubeSize);
-                gl.TexCoord(0.0f, 1.0f); gl.Vertex(-cubeSize, -cubeSize, -cubeSize);
+                gl.TexCoord(0.0f, 0.0f); gl.Vertex(-skyBoxSize, skyBoxSize, -skyBoxSize);
+                gl.TexCoord(1.0f, 0.0f); gl.Vertex(skyBoxSize, skyBoxSize, -skyBoxSize);
+                gl.TexCoord(1.0f, 1.0f); gl.Vertex(skyBoxSize, -skyBoxSize, -skyBoxSize);
+                gl.TexCoord(0.0f, 1.0f); gl.Vertex(-skyBoxSize, -skyBoxSize, -skyBoxSize);
             }
             gl.End();
 
             textures[4].Bind(gl);
             gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
             {
-                gl.TexCoord(0.0f, 0.0f); gl.Vertex(cubeSize, cubeSize, -cubeSize);
-                gl.TexCoord(1.0f, 0.0f); gl.Vertex(cubeSize, cubeSize, cubeSize);
-                gl.TexCoord(1.0f, 1.0f); gl.Vertex(cubeSize, -cubeSize, cubeSize);
-                gl.TexCoord(0.0f, 1.0f); gl.Vertex(cubeSize, -cubeSize, -cubeSize);
+                gl.TexCoord(0.0f, 0.0f); gl.Vertex(skyBoxSize, skyBoxSize, -skyBoxSize);
+                gl.TexCoord(1.0f, 0.0f); gl.Vertex(skyBoxSize, skyBoxSize, skyBoxSize);
+                gl.TexCoord(1.0f, 1.0f); gl.Vertex(skyBoxSize, -skyBoxSize, skyBoxSize);
+                gl.TexCoord(0.0f, 1.0f); gl.Vertex(skyBoxSize, -skyBoxSize, -skyBoxSize);
             }
             gl.End();
 
             textures[5].Bind(gl);
             gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
             {
-                gl.TexCoord(0.0f, 0.0f); gl.Vertex(cubeSize, cubeSize, -cubeSize);
-                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-cubeSize, cubeSize, -cubeSize);
-                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-cubeSize, cubeSize, cubeSize);
-                gl.TexCoord(0.0f, 1.0f); gl.Vertex(cubeSize, cubeSize, cubeSize);
+                gl.TexCoord(0.0f, 0.0f); gl.Vertex(skyBoxSize, skyBoxSize, -skyBoxSize);
+                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-skyBoxSize, skyBoxSize, -skyBoxSize);
+                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-skyBoxSize, skyBoxSize, skyBoxSize);
+                gl.TexCoord(0.0f, 1.0f); gl.Vertex(skyBoxSize, skyBoxSize, skyBoxSize);
             }
             gl.End();
 
             textures[6].Bind(gl);
             gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
             {
-                gl.TexCoord(0.0f, 0.0f); gl.Vertex(cubeSize, cubeSize, cubeSize);
-                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-cubeSize, cubeSize, cubeSize);
-                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-cubeSize, -cubeSize, cubeSize);
-                gl.TexCoord(0.0f, 1.0f); gl.Vertex(cubeSize, -cubeSize, cubeSize);
+                gl.TexCoord(0.0f, 0.0f); gl.Vertex(skyBoxSize, skyBoxSize, skyBoxSize);
+                gl.TexCoord(1.0f, 0.0f); gl.Vertex(-skyBoxSize, skyBoxSize, skyBoxSize);
+                gl.TexCoord(1.0f, 1.0f); gl.Vertex(-skyBoxSize, -skyBoxSize, skyBoxSize);
+                gl.TexCoord(0.0f, 1.0f); gl.Vertex(skyBoxSize, -skyBoxSize, skyBoxSize);
             }
             gl.End();
         }

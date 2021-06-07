@@ -35,6 +35,9 @@ namespace EP
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.numMax = new System.Windows.Forms.NumericUpDown();
+            this.rbCubes = new System.Windows.Forms.RadioButton();
+            this.rbPortal = new System.Windows.Forms.RadioButton();
+            this.rbBeams = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.frameGL)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMin)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMax)).BeginInit();
@@ -103,11 +106,46 @@ namespace EP
             0,
             0});
             // 
+            // rbCubes
+            // 
+            this.rbCubes.AutoSize = true;
+            this.rbCubes.Checked = true;
+            this.rbCubes.Location = new System.Drawing.Point(742, 264);
+            this.rbCubes.Name = "rbCubes";
+            this.rbCubes.Size = new System.Drawing.Size(64, 19);
+            this.rbCubes.TabIndex = 3;
+            this.rbCubes.TabStop = true;
+            this.rbCubes.Text = "Cubes";
+            this.rbCubes.UseVisualStyleBackColor = true;
+            // 
+            // rbPortal
+            // 
+            this.rbPortal.AutoSize = true;
+            this.rbPortal.Location = new System.Drawing.Point(742, 311);
+            this.rbPortal.Name = "rbPortal";
+            this.rbPortal.Size = new System.Drawing.Size(60, 19);
+            this.rbPortal.TabIndex = 3;
+            this.rbPortal.Text = "Portal";
+            this.rbPortal.UseVisualStyleBackColor = true;
+            // 
+            // rbBeams
+            // 
+            this.rbBeams.AutoSize = true;
+            this.rbBeams.Location = new System.Drawing.Point(742, 358);
+            this.rbBeams.Name = "rbBeams";
+            this.rbBeams.Size = new System.Drawing.Size(66, 19);
+            this.rbBeams.TabIndex = 3;
+            this.rbBeams.Text = "Beams";
+            this.rbBeams.UseVisualStyleBackColor = true;
+            // 
             // EP_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(866, 605);
+            this.Controls.Add(this.rbBeams);
+            this.Controls.Add(this.rbPortal);
+            this.Controls.Add(this.rbCubes);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numMax);
@@ -134,6 +172,9 @@ namespace EP
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown numMax;
+        private System.Windows.Forms.RadioButton rbCubes;
+        private System.Windows.Forms.RadioButton rbPortal;
+        private System.Windows.Forms.RadioButton rbBeams;
     }
 }
 

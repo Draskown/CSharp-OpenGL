@@ -98,8 +98,40 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bmps\1_Color.bmp" />
+    <Content Include="bmps\1_Map.bmp" />
+    <Content Include="bmps\2_Color.bmp" />
+    <Content Include="bmps\2_Map.bmp" />
+    <Content Include="bmps\3_Color.bmp" />
+    <Content Include="bmps\3_Map.bmp" />
+    <Content Include="bmps\4_Color.bmp" />
+    <Content Include="bmps\4_Map.bmp" />
+    <Content Include="bmps\5_Color.bmp" />
+    <Content Include="bmps\5_Map.bmp" />
+    <Content Include="bmps\6_Color.bmp" />
+    <Content Include="bmps\6_Map.bmp" />
+    <Content Include="bmps\7_Color.bmp" />
+    <Content Include="bmps\7_Map.bmp" />
+    <Content Include="bmps\8_Color.bmp" />
+    <Content Include="bmps\8_Map.bmp" />
+    <Content Include="bmps\9_Color.bmp" />
+    <Content Include="bmps\9_Map.bmp" />
     <Content Include="SharpGL.ico" />
     <Content Include="SharpGL.png" />
+    <Content Include="Textures\MainSkybox\negx.jpg" />
+    <Content Include="Textures\MainSkybox\negy.jpg" />
+    <Content Include="Textures\MainSkybox\negz.jpg" />
+    <Content Include="Textures\MainSkybox\portal.jpg" />
+    <Content Include="Textures\MainSkybox\posx.jpg" />
+    <Content Include="Textures\MainSkybox\posy.jpg" />
+    <Content Include="Textures\MainSkybox\posz.jpg" />
+    <Content Include="Textures\OtherSkybox\negx.jpg" />
+    <Content Include="Textures\OtherSkybox\negy.jpg" />
+    <Content Include="Textures\OtherSkybox\negz.jpg" />
+    <Content Include="Textures\OtherSkybox\portal.jpg" />
+    <Content Include="Textures\OtherSkybox\posx.jpg" />
+    <Content Include="Textures\OtherSkybox\posy.jpg" />
+    <Content Include="Textures\OtherSkybox\posz.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

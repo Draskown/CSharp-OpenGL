@@ -38,6 +38,8 @@ namespace EP
             this.rbCubes = new System.Windows.Forms.RadioButton();
             this.rbPortal = new System.Windows.Forms.RadioButton();
             this.rbBeams = new System.Windows.Forms.RadioButton();
+            this.cbImages = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.frameGL)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMin)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMax)).BeginInit();
@@ -58,7 +60,7 @@ namespace EP
             // numMin
             // 
             this.numMin.ForeColor = System.Drawing.Color.White;
-            this.numMin.Location = new System.Drawing.Point(712, 105);
+            this.numMin.Location = new System.Drawing.Point(714, 172);
             this.numMin.Maximum = new decimal(new int[] {
             255,
             0,
@@ -72,7 +74,7 @@ namespace EP
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(736, 87);
+            this.label1.Location = new System.Drawing.Point(751, 154);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(67, 15);
             this.label1.TabIndex = 2;
@@ -81,7 +83,7 @@ namespace EP
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(736, 23);
+            this.label2.Location = new System.Drawing.Point(748, 90);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(72, 15);
             this.label2.TabIndex = 2;
@@ -90,7 +92,7 @@ namespace EP
             // numMax
             // 
             this.numMax.ForeColor = System.Drawing.Color.White;
-            this.numMax.Location = new System.Drawing.Point(712, 41);
+            this.numMax.Location = new System.Drawing.Point(714, 108);
             this.numMax.Maximum = new decimal(new int[] {
             255,
             0,
@@ -138,14 +140,33 @@ namespace EP
             this.rbBeams.Text = "Beams";
             this.rbBeams.UseVisualStyleBackColor = true;
             // 
+            // cbImages
+            // 
+            this.cbImages.FormattingEnabled = true;
+            this.cbImages.Location = new System.Drawing.Point(714, 46);
+            this.cbImages.Name = "cbImages";
+            this.cbImages.Size = new System.Drawing.Size(140, 23);
+            this.cbImages.TabIndex = 4;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(728, 28);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(113, 15);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Choose an image";
+            // 
             // EP_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(866, 605);
+            this.Controls.Add(this.cbImages);
             this.Controls.Add(this.rbBeams);
             this.Controls.Add(this.rbPortal);
             this.Controls.Add(this.rbCubes);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numMax);
@@ -175,6 +196,8 @@ namespace EP
         private System.Windows.Forms.RadioButton rbCubes;
         private System.Windows.Forms.RadioButton rbPortal;
         private System.Windows.Forms.RadioButton rbBeams;
+        private System.Windows.Forms.ComboBox cbImages;
+        private System.Windows.Forms.Label label3;
     }
 }
 

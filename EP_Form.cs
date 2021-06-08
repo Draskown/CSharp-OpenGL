@@ -6,6 +6,7 @@ using System.Linq;
 using SharpGL;
 using System;
 using GlmNet;
+using System.IO;
 
 namespace EP
 {
@@ -18,41 +19,26 @@ namespace EP
         private readonly Texture[] mainSBTextures;
         private readonly Texture[] otherSBTextures;
 
-        private readonly Bitmap coloredImage, depthMap;
+        private Bitmap coloredImage, depthMap;
 
         private readonly List<float[]> points;
 
-        private PointF delta, angle, initPoint;
+        private vec3 cameraPos, cameraFront, cameraUp, direction;
 
         private Color color;
 
-        private readonly float angleDelta, scale,
+        private readonly float scale,
                                skyBoxSize, cubeSize,
-                               portalSize;
-        private float distance, portalDistance,
+                               portalSize, cameraSpeed;
+        private float portalDistance,
                       cubesMoveDelta, cubesRotationDelta,
                       objCentreX, objCentreY, objCentreZ,
-                      maxZ;
+                      xOffset, yOffset, yaw, pitch;
 
-        private readonly int imageIndex, pointSize,
-                             cubesAmount;
-        private int threshMin, threshMax, depth;
+        private readonly int pointSize, cubesAmount;
+        private int threshMin, threshMax, depth, lastX, lastY;
 
         private bool currentSB;
-
-
-
-        private vec3 cameraPos = new vec3(0.0f, 0.0f, 6.0f);
-        private vec3 cameraFront = new vec3(0.0f, 0.0f, -1.0f);
-        private vec3 cameraUp = new vec3(0.0f, 1.0f, 0.0f);
-
-        private float cameraSpeed = 0.5f, yaw = 0.0f, pitch = 0.0f,
-                    xOffset = 0, yOffset = 0;
-
-        private int lastX = 160,
-                    lastY = 120;
-
-        private bool firstMouse = true;
 
         public EP_Form()
         {
@@ -68,31 +54,30 @@ namespace EP
             for (int i = 0; i < otherSBTextures.Length; i++)
                 otherSBTextures[i] = new Texture();
 
-            imageIndex = 7;
             pointSize = 2;
             cubesAmount = 6;
 
-            depthMap = new Bitmap(Image.FromFile($"Images/bmps/{imageIndex}_Map.bmp"));
-            coloredImage = new Bitmap(
-                Image.FromFile($"Images/bmps/{imageIndex}_Color.bmp"),
-                new Size(depthMap.Width, depthMap.Height));
-
             points = new List<float[]>();
 
-            delta = new PointF(0.0f, 0.0f);
-            angle = new PointF(0.0f, 0.0f);
+            cameraPos = new vec3(0.0f, 0.0f, 6.0f);
+            cameraFront = new vec3(0.0f, 0.0f, -1.0f);
+            cameraUp = new vec3(0.0f, 1.0f, 0.0f);
 
-            angleDelta = 0.02f;
-            distance = 6.0f;
             scale = 100.0f;
             skyBoxSize = 50.0f;
             cubeSize = 0.1f;
             portalSize = 1.0f;
+            cameraSpeed = 0.5f;
             portalDistance = 0.0f;
             cubesMoveDelta = cubesRotationDelta = 0.0f;
-            maxZ = 0.0f;
+            xOffset = yOffset = 0.0f; 
+            yaw = pitch = 0.0f;
+
+            lastX = lastY = 0;
 
             currentSB = true;
+
+            ReadFiles();
 
             InitTextures();
         }
@@ -101,11 +86,37 @@ namespace EP
         private void EP_Form_Load(object sender, EventArgs e)
         {
             this.frameGL.FrameRate = 60;
-            this.frameGL.MouseDown += (ss, ee) => initPoint = ee.Location;
-            this.frameGL.MouseWheel += ChangeDistance;
+            this.frameGL.MouseDown += (ss, ee) => { 
+                lastX = ee.Location.X;
+                lastY = ee.Location.Y;
+            };
             this.frameGL.MouseMove += ChangePosition;
             this.frameGL.OpenGLDraw += Draw;
             this.frameGL.KeyDown += HandleMoving;
+
+            this.cbImages.SelectedIndexChanged += ChangeObject;
+        }
+
+
+        private void ReadFiles()
+        {
+            var path = new DirectoryInfo(@"Images\bmps");
+
+            foreach (var file in path.GetFiles("*_Color.bmp"))
+                this.cbImages.Items.Add(file.Name.Split('_')[0]);
+
+            this.cbImages.SelectedIndex = 0;
+            ChangeObject(null, null);
+        }
+
+
+        private void ChangeObject(object sender, EventArgs e)
+        {
+            var fileName = this.cbImages.SelectedItem.ToString();
+            depthMap = new Bitmap(Image.FromFile($"Images/bmps/{fileName}_Map.bmp"));
+            coloredImage = new Bitmap(
+                Image.FromFile($"Images/bmps/{fileName}_Color.bmp"),
+                new Size(depthMap.Width, depthMap.Height));
         }
 
 
@@ -146,9 +157,6 @@ namespace EP
             threshMin = (int)numMin.Value;
             threshMax = (int)numMax.Value;
 
-            //gl.Translate(delta.X, delta.Y, -distance);
-            //gl.Rotate(angle.Y, angle.X, 0.0f);
-
             gl.LookAt(cameraPos.x, cameraPos.y, cameraPos.z,
                       (cameraPos + cameraFront).x, (cameraPos + cameraFront).y, (cameraPos + cameraFront).z,
                       cameraUp.x, cameraUp.y, cameraUp.z);
@@ -168,7 +176,9 @@ namespace EP
 
             gl.Disable(OpenGL.GL_TEXTURE_2D);
 
-            gl.PointSize(pointSize);
+            points.Clear();
+
+            gl.PointSize(pointSize * 2);
             gl.Begin(OpenGL.GL_POINTS);
             {
                 gl.Color(1.0f, 1.0f, 1.0f);
@@ -180,10 +190,10 @@ namespace EP
                         color = coloredImage.GetPixel(x, y);
                         depth = (int)depthMap.GetPixel(x, y).R;
 
-                        if (currentSB && depth <= threshMin || depth >= threshMax)
+                        if (!rbPortal.Checked && (depth >= threshMax || depth <= threshMin))
                             continue;
 
-                        if (!currentSB && depth >= threshMin || depth >= threshMax)
+                        if (!rbPortal.Checked && (depth >= threshMax || depth <= threshMin))
                             continue;
 
                         var p = UVD2XYZ(x, y, depth);
@@ -192,6 +202,13 @@ namespace EP
                         p[1] /= scale;
                         p[2] = (scale - p[2]) / scale;
 
+                        if (currentSB && Math.Abs(p[0]) <= portalSize && Math.Abs(p[1]) <= portalSize && p[2] <= portalDistance || 
+                            !currentSB && Math.Abs(p[0]) <= portalSize && Math.Abs(p[1]) <= portalSize && p[2] >= portalDistance)
+                            continue;
+
+                        if (!currentSB && (Math.Abs(p[0]) >= portalSize || Math.Abs(p[1]) >= portalSize))
+                            continue;
+
                         gl.Color(color.R, color.G, color.B);
                         gl.Vertex(p);
                         points.Add(p);
@@ -199,10 +216,12 @@ namespace EP
             }
             gl.End();
 
-            objCentreX = points.Average(p => p[0]);
-            objCentreY = points.Average(p => p[1]);
-            objCentreZ = points.Average(p => p[2]);
-            maxZ = points.Max(p => p[2]);
+            if (points.Count != 0)
+            {
+                objCentreX = points.Average(p => p[0]);
+                objCentreY = points.Average(p => p[1]);
+                objCentreZ = points.Average(p => p[2]);
+            }
 
             if (rbCubes.Checked)
             {
@@ -284,38 +303,23 @@ namespace EP
         #endregion
 
 
+
         #region Checking in which dimension the camera currently is
 
         private void CheckSB()
         {
             if (rbPortal.Checked &&
                 currentSB &&
-                Math.Abs(delta.X - objCentreX) < portalSize * 2 &&
-                Math.Abs(delta.Y - objCentreY) < portalSize * 2 &&
-                distance < portalDistance &&
-                (angle.X % 360.0f >= 0.0f &&
-                angle.X % 360.0f < 90.0f || angle.X % 360.0f > 270.0f ||
-                angle.X % 360.0f < 0.0f &&
-                angle.X % 360.0f > -90.0f || angle.X % 360.0f < -270.0f) &&
-                (angle.Y % 360.0f >= 0.0f &&
-                angle.Y % 360.0f < 90.0f || angle.Y % 360.0f > 270.0f ||
-                angle.Y % 360.0f < 0.0f &&
-                angle.Y % 360.0f > -90.0f || angle.Y % 360.0f < -270.0f))
+                Math.Abs(cameraPos.x) <= portalSize &&
+                Math.Abs(cameraPos.y) <= portalSize &&
+                cameraPos.z < portalDistance)
                 currentSB = false;
 
             if (rbPortal.Checked &&
                 !currentSB &&
-                Math.Abs(delta.X - objCentreX) < portalSize * 2 &&
-                Math.Abs(delta.Y - objCentreY) < portalSize * 2 &&
-                distance < portalDistance &&
-                (angle.X % 360.0f >= 180.0f &&
-                angle.X % 360.0f <= 270.0f || angle.X % 360.0f > 90.0f ||
-                angle.X % 360.0f < 180.0f &&
-                angle.X % 360.0f >= 90.0f || angle.X % 360.0f < -90.0f) &&
-                (angle.Y % 360.0f >= 0.0f &&
-                angle.Y % 360.0f < 90.0f || angle.Y % 360.0f > 270.0f ||
-                angle.Y % 360.0f < 0.0f &&
-                angle.Y % 360.0f > -90.0f || angle.Y % 360.0f < -270.0f))
+                Math.Abs(cameraPos.x) <= portalSize &&
+                Math.Abs(cameraPos.y) <= portalSize &&
+                cameraPos.z > portalDistance)
                 currentSB = true;
         }
 
@@ -405,11 +409,11 @@ namespace EP
                 texarr[7].Bind(gl);
                 gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
                 {
-                    portalDistance = Map(numMin.Value, numMin.Minimum, numMin.Maximum, 0.0f, maxZ);
-                    gl.TexCoord(0.0f, 0.0f); gl.Vertex(objCentreX - portalSize, objCentreY + portalSize, portalDistance);
-                    gl.TexCoord(1.0f, 0.0f); gl.Vertex(objCentreX + portalSize, objCentreY + portalSize, portalDistance);
-                    gl.TexCoord(1.0f, 1.0f); gl.Vertex(objCentreX + portalSize, objCentreY - portalSize, portalDistance);
-                    gl.TexCoord(0.0f, 1.0f); gl.Vertex(objCentreX - portalSize, objCentreY - portalSize, portalDistance);
+                    portalDistance = Map(numMin.Value, numMin.Minimum, numMin.Maximum, -1.0f, 5.0f);
+                    gl.TexCoord(0.0f, 0.0f); gl.Vertex(- portalSize, + portalSize, portalDistance);
+                    gl.TexCoord(1.0f, 0.0f); gl.Vertex(+ portalSize, + portalSize, portalDistance);
+                    gl.TexCoord(1.0f, 1.0f); gl.Vertex(+ portalSize, - portalSize, portalDistance);
+                    gl.TexCoord(0.0f, 1.0f); gl.Vertex(- portalSize, - portalSize, portalDistance);
                 }
                 gl.End();
             }
@@ -419,37 +423,12 @@ namespace EP
 
 
 
-        #region Mouse moving
+        #region Camera moving
 
         private void ChangePosition(object sender, MouseEventArgs e)
         {
-            //if (e.Button == MouseButtons.Left)
-            //{
-            //    PointF finalPoint = e.Location;
-
-            //    if (ModifierKeys == Keys.Shift)
-            //    {
-            //        angle.X += (finalPoint.X - initPoint.X) * angleDelta;
-            //        angle.Y += (finalPoint.Y - initPoint.Y) * angleDelta;
-            //    }
-            //    else
-            //    {
-            //        delta.X += (finalPoint.X - initPoint.X) / 100;
-            //        delta.Y -= (finalPoint.Y - initPoint.Y) / 100;
-            //    }
-
-            //    initPoint = finalPoint;
-
-            //    //Console.WriteLine(delta + distance.ToString() + "\n\r");
-            //    //Console.WriteLine($"{{ {angle.X % 360}, {angle.Y % 360} }} \n\r");
-            //}
-
-            if (firstMouse)
-            {
-                lastX = e.Location.X;
-                lastY = e.Location.Y;
-                firstMouse = false;
-            }
+            if (e.Button != MouseButtons.Left)
+                return;
 
             xOffset += e.Location.X - lastX;
             yOffset += e.Location.Y - lastY;
@@ -468,19 +447,15 @@ namespace EP
             if (pitch < -89.0f)
                 pitch = -89.0f;
 
-            vec3 direction = new vec3();
-            direction.x = glm.cos(glm.radians(yaw)) * glm.cos(glm.radians(pitch));
-            direction.y = glm.sin(glm.radians(pitch));
-            direction.z = glm.sin(glm.radians(yaw)) * glm.cos(glm.radians(pitch));
+            direction = new vec3
+            {
+                x = glm.cos(glm.radians(yaw)) * glm.cos(glm.radians(pitch)),
+                y = glm.sin(glm.radians(pitch)),
+                z = glm.sin(glm.radians(yaw)) * glm.cos(glm.radians(pitch))
+            };
+
             cameraFront = glm.normalize(direction);
         }
-
-
-        private void ChangeDistance(object sender, MouseEventArgs e)
-        {
-            distance -= e.Delta / 120;
-        }
-
 
 
         private void HandleMoving(object sender, KeyEventArgs e)

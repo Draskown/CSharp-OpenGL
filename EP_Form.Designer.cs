@@ -38,7 +38,7 @@ namespace EP
             this.rbCubes = new System.Windows.Forms.RadioButton();
             this.rbPortal = new System.Windows.Forms.RadioButton();
             this.rbBeams = new System.Windows.Forms.RadioButton();
-            this.cbImages = new System.Windows.Forms.ComboBox();
+            this.cbObjects = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.frameGL)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numMin)).BeginInit();
@@ -140,29 +140,29 @@ namespace EP
             this.rbBeams.Text = "Beams";
             this.rbBeams.UseVisualStyleBackColor = true;
             // 
-            // cbImages
+            // cbObjects
             // 
-            this.cbImages.FormattingEnabled = true;
-            this.cbImages.Location = new System.Drawing.Point(714, 46);
-            this.cbImages.Name = "cbImages";
-            this.cbImages.Size = new System.Drawing.Size(140, 23);
-            this.cbImages.TabIndex = 4;
+            this.cbObjects.FormattingEnabled = true;
+            this.cbObjects.Location = new System.Drawing.Point(714, 46);
+            this.cbObjects.Name = "cbObjects";
+            this.cbObjects.Size = new System.Drawing.Size(140, 23);
+            this.cbObjects.TabIndex = 4;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(728, 28);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(113, 15);
+            this.label3.Size = new System.Drawing.Size(114, 15);
             this.label3.TabIndex = 2;
-            this.label3.Text = "Choose an image";
+            this.label3.Text = "Choose an object";
             // 
             // EP_Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(866, 605);
-            this.Controls.Add(this.cbImages);
+            this.Controls.Add(this.cbObjects);
             this.Controls.Add(this.rbBeams);
             this.Controls.Add(this.rbPortal);
             this.Controls.Add(this.rbCubes);
@@ -196,7 +196,7 @@ namespace EP
         private System.Windows.Forms.RadioButton rbCubes;
         private System.Windows.Forms.RadioButton rbPortal;
         private System.Windows.Forms.RadioButton rbBeams;
-        private System.Windows.Forms.ComboBox cbImages;
+        private System.Windows.Forms.ComboBox cbObjects;
         private System.Windows.Forms.Label label3;
     }
 }

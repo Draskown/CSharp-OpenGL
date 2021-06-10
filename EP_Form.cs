@@ -68,7 +68,7 @@ namespace EP
 
             scale = 100.0f;
             skyBoxSize = 50.0f;
-            cubeSize = 0.05f;
+            cubeSize = 0.1f;
             portalSize = 1.0f;
             cameraSpeed = 0.5f;
             portalDistance = 0.0f;
@@ -99,7 +99,7 @@ namespace EP
             this.frameGL.OpenGLDraw += Draw;
             this.frameGL.KeyDown += HandleMoving;
 
-            this.cbImages.SelectedIndexChanged += ChangeObject;
+            this.cbObjects.SelectedIndexChanged += ChangeObject;
         }
 
 
@@ -108,16 +108,16 @@ namespace EP
             var path = new DirectoryInfo(@"Images\bmps");
 
             foreach (var file in path.GetFiles("*_Color.bmp"))
-                this.cbImages.Items.Add(file.Name.Split('_')[0]);
+                this.cbObjects.Items.Add(file.Name.Split('_')[0]);
 
-            this.cbImages.SelectedIndex = 0;
+            this.cbObjects.SelectedIndex = 0;
             ChangeObject(null, null);
         }
 
 
         private void ChangeObject(object sender, EventArgs e)
         {
-            var fileName = this.cbImages.SelectedItem.ToString();
+            var fileName = this.cbObjects.SelectedItem.ToString();
             depthMap = new Bitmap(Image.FromFile($"Images/bmps/{fileName}_Map.bmp"));
             coloredImage = new Bitmap(
                 Image.FromFile($"Images/bmps/{fileName}_Color.bmp"),

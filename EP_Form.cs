@@ -22,6 +22,7 @@ namespace EP
         private Bitmap coloredImage, depthMap;
 
         private readonly List<float[]> points;
+        private readonly List<float[]> canny;
 
         private vec3 cameraPos, cameraFront, cameraUp, direction;
 
@@ -29,7 +30,8 @@ namespace EP
 
         private readonly float scale,
                                skyBoxSize, cubeSize,
-                               portalSize, cameraSpeed;
+                               portalSize, cameraSpeed, 
+                               beamsSize, beamsHeight;
         private float portalDistance,
                       cubesMoveDelta, cubesRotationDelta,
                       objCentreX, objCentreY, objCentreZ,
@@ -58,6 +60,7 @@ namespace EP
             cubesAmount = 6;
 
             points = new List<float[]>();
+            canny = new List<float[]>();
 
             cameraPos = new vec3(0.0f, 0.0f, 6.0f);
             cameraFront = new vec3(0.0f, 0.0f, -1.0f);
@@ -65,13 +68,15 @@ namespace EP
 
             scale = 100.0f;
             skyBoxSize = 50.0f;
-            cubeSize = 0.1f;
+            cubeSize = 0.05f;
             portalSize = 1.0f;
             cameraSpeed = 0.5f;
             portalDistance = 0.0f;
             cubesMoveDelta = cubesRotationDelta = 0.0f;
             xOffset = yOffset = 0.0f; 
             yaw = pitch = 0.0f;
+            beamsSize = 0.05f;
+            beamsHeight = 0.5f;
 
             lastX = lastY = 0;
 
@@ -177,16 +182,15 @@ namespace EP
             gl.Disable(OpenGL.GL_TEXTURE_2D);
 
             points.Clear();
+            canny.Clear();
 
             gl.PointSize(pointSize * 2);
             gl.Begin(OpenGL.GL_POINTS);
             {
-                gl.Color(1.0f, 1.0f, 1.0f);
-                gl.Vertex(0.0f, 0.0f, 0.0f);
-
-                for (int x = 0; x < coloredImage.Width; x += pointSize)
-                    for (int y = 0; y < coloredImage.Height; y += pointSize)
+                for (int x = 1; x < coloredImage.Width; x += pointSize)
+                    for (int y = 1; y < coloredImage.Height; y += pointSize)
                     {
+                        var contour = false;
                         color = coloredImage.GetPixel(x, y);
                         depth = (int)depthMap.GetPixel(x, y).R;
 
@@ -195,6 +199,11 @@ namespace EP
 
                         if (!rbPortal.Checked && (depth >= threshMax || depth <= threshMin))
                             continue;
+
+                        if ((Math.Abs(depth - depthMap.GetPixel(x - 1, y).R) > 10 ||
+                            Math.Abs(depth - depthMap.GetPixel(x, y - 1).R) > 10) &&
+                            depth > 200)
+                            contour = true;
 
                         var p = UVD2XYZ(x, y, depth);
 
@@ -212,23 +221,29 @@ namespace EP
                         gl.Color(color.R, color.G, color.B);
                         gl.Vertex(p);
                         points.Add(p);
+
+                        if (contour)
+                            canny.Add(p);
                     }
             }
             gl.End();
 
-            if (points.Count != 0)
+            if (canny.Count != 0)
             {
-                objCentreX = points.Average(p => p[0]);
-                objCentreY = points.Average(p => p[1]);
-                objCentreZ = points.Average(p => p[2]);
+                objCentreX = canny.Average(p => p[0]);
+                objCentreY = canny.Average(p => p[1]);
+                objCentreZ = canny.Average(p => p[2]);
             }
 
-            if (rbCubes.Checked)
+            gl.Enable(OpenGL.GL_BLEND);
+            gl.BlendFunc(OpenGL.GL_SRC_ALPHA, OpenGL.GL_ONE_MINUS_SRC_ALPHA);
+
+            if (rbCubes.Checked && currentSB)
             {
-                gl.Color(1.0f, 0.0f, 1.0f, 1.0f);
-                gl.Translate(objCentreX, objCentreY, objCentreZ + 0.5f);
+                gl.Color(0.7f, 0.0f, 0.7f, 0.7f);
+                gl.Translate(objCentreX, objCentreY, objCentreZ);
                 gl.Rotate(0.0f, 0.0f, cubesRotationDelta);
-                gl.Begin(OpenGL.GL_QUADS);
+                gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
                 {
                     for (int k = 0; k < cubesAmount; k++)
                     {
@@ -269,7 +284,49 @@ namespace EP
                 gl.End();
             }
 
+            if (rbBeams.Checked && currentSB)
+            {
+                gl.Color(0.0f, 0.7f, 0.0f, 0.5f);
+                gl.Translate(objCentreX, objCentreY, objCentreZ);
+                gl.Begin(SharpGL.Enumerations.BeginMode.Quads);
+                {
+                    gl.Vertex(- beamsSize, 0.0f, - beamsSize);
+                    gl.Vertex(+ beamsSize, 0.0f, - beamsSize);
+                    gl.Vertex(+ beamsSize, 0.0f, + beamsSize);
+                    gl.Vertex(- beamsSize, 0.0f, + beamsSize);
+
+                    gl.Vertex(- beamsSize, 0.0f, - beamsSize);
+                    gl.Vertex(- beamsSize, 0.0f, + beamsSize);
+                    gl.Vertex(- beamsSize, beamsHeight, + beamsSize);
+                    gl.Vertex(- beamsSize, beamsHeight, - beamsSize);
+
+                    gl.Vertex(- beamsSize, 0.0f, - beamsSize);
+                    gl.Vertex(+ beamsSize, 0.0f, - beamsSize);
+                    gl.Vertex(+ beamsSize, + beamsHeight, - beamsSize);
+                    gl.Vertex(- beamsSize, + beamsHeight, - beamsSize);
+
+                    gl.Vertex(+ beamsSize, 0.0f, - beamsSize);
+                    gl.Vertex(+ beamsSize, 0.0f, + beamsSize);
+                    gl.Vertex(+ beamsSize, + beamsHeight, + beamsSize);
+                    gl.Vertex(+ beamsSize, + beamsHeight, - beamsSize);
+
+                    gl.Vertex(- beamsSize, 0.0f, + beamsSize);
+                    gl.Vertex(+ beamsSize, 0.0f, + beamsSize);
+                    gl.Vertex(+ beamsSize, + beamsHeight, + beamsSize);
+                    gl.Vertex(- beamsSize, + beamsHeight, + beamsSize);
+
+                    gl.Vertex(- beamsSize, + beamsHeight, - beamsSize);
+                    gl.Vertex(+ beamsSize, + beamsHeight, - beamsSize);
+                    gl.Vertex(+ beamsSize, + beamsHeight, + beamsSize);
+                    gl.Vertex(- beamsSize, + beamsHeight, + beamsSize);
+                }
+                gl.End();
+            }
+
             gl.Flush();
+            gl.Disable(OpenGL.GL_BLEND);
+            gl.Disable(OpenGL.GL_DEPTH_TEST);
+            gl.Disable(OpenGL.GL_ALPHA_TEST);
 
             cubesMoveDelta += 0.0125f;
             cubesRotationDelta += 2.0f;

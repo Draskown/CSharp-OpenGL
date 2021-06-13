@@ -98,28 +98,16 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bmps\3_Map.bmp" />
-    <Content Include="bmps\4_Map.bmp" />
-    <Content Include="bmps\7_Map.bmp" />
-    <Content Include="bmps\9_Map.bmp" />
-    <Content Include="Images\bmps\1_Color.bmp" />
-    <Content Include="Images\bmps\1_Map.bmp" />
-    <Content Include="Images\bmps\2_Color.bmp" />
-    <Content Include="Images\bmps\2_Map.bmp" />
-    <Content Include="Images\bmps\3_Color.bmp" />
-    <Content Include="Images\bmps\3_Map.bmp" />
-    <Content Include="Images\bmps\4_Color.bmp" />
-    <Content Include="Images\bmps\4_Map.bmp" />
-    <Content Include="Images\bmps\5_Color.bmp" />
-    <Content Include="Images\bmps\5_Map.bmp" />
-    <Content Include="Images\bmps\6_Color.bmp" />
-    <Content Include="Images\bmps\6_Map.bmp" />
-    <Content Include="Images\bmps\7_Color.bmp" />
-    <Content Include="Images\bmps\7_Map.bmp" />
-    <Content Include="Images\bmps\8_Color.bmp" />
-    <Content Include="Images\bmps\8_Map.bmp" />
-    <Content Include="Images\bmps\9_Color.bmp" />
-    <Content Include="Images\bmps\9_Map.bmp" />
+    <Content Include="Images\bmps\Ball_Color.bmp" />
+    <Content Include="Images\bmps\Ball_Map.bmp" />
+    <Content Include="Images\bmps\Chair_Color.bmp" />
+    <Content Include="Images\bmps\Chair_Map.bmp" />
+    <Content Include="Images\bmps\Globe_Color.bmp" />
+    <Content Include="Images\bmps\Globe_Map.bmp" />
+    <Content Include="Images\bmps\TableSideways_Color.bmp" />
+    <Content Include="Images\bmps\TableSideways_Map.bmp" />
+    <Content Include="Images\bmps\Table_Color.bmp" />
+    <Content Include="Images\bmps\Table_Map.bmp" />
     <Content Include="Images\Textures\MainSkybox\negx.jpg" />
     <Content Include="Images\Textures\MainSkybox\negy.jpg" />
     <Content Include="Images\Textures\MainSkybox\negz.jpg" />
@@ -136,8 +124,6 @@
     <Content Include="Images\Textures\OtherSkybox\posz.jpg" />
     <Content Include="SharpGL.ico" />
     <Content Include="SharpGL.png" />
-    <Content Include="Textures\MainSkybox\portal.jpg" />
-    <Content Include="Textures\OtherSkybox\portal.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

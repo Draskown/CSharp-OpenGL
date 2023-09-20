@@ -91,10 +91,12 @@ namespace EP
         private void EP_Form_Load(object sender, EventArgs e)
         {
             this.frameGL.FrameRate = 60;
+
             this.frameGL.MouseDown += (ss, ee) => { 
                 lastX = ee.Location.X;
                 lastY = ee.Location.Y;
             };
+
             this.frameGL.MouseMove += ChangePosition;
             this.frameGL.OpenGLDraw += Draw;
             this.frameGL.KeyDown += HandleMoving;
@@ -111,6 +113,7 @@ namespace EP
                 this.cbObjects.Items.Add(file.Name.Split('_')[0]);
 
             this.cbObjects.SelectedIndex = 0;
+
             ChangeObject(null, null);
         }
 
@@ -191,6 +194,7 @@ namespace EP
                     for (int y = 1; y < coloredImage.Height; y += pointSize)
                     {
                         var contour = false;
+
                         color = coloredImage.GetPixel(x, y);
                         depth = (int)depthMap.GetPixel(x, y).R;
 
@@ -336,7 +340,7 @@ namespace EP
 
 
 
-        #region Values conversion
+        #region Coordinates mapping
 
         private float[] UVD2XYZ(float u, float v, float d)
         {
@@ -481,7 +485,6 @@ namespace EP
 
 
         #region Camera moving
-
         private void ChangePosition(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left)
@@ -527,9 +530,7 @@ namespace EP
                 cameraPos += glm.normalize(glm.cross(cameraFront, cameraUp)) * cameraSpeed;
         }
 
-
         #endregion
-
 
 
         #region Mapping

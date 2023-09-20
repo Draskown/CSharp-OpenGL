@@ -49,16 +49,17 @@ namespace EP
             // 
             this.frameGL.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.frameGL.DrawFPS = false;
-            this.frameGL.Location = new System.Drawing.Point(16, 16);
+            this.frameGL.Location = new System.Drawing.Point(14, 14);
             this.frameGL.Name = "frameGL";
             this.frameGL.OpenGLVersion = SharpGL.Version.OpenGLVersion.OpenGL2_1;
             this.frameGL.RenderContextType = SharpGL.RenderContextType.DIBSection;
             this.frameGL.RenderTrigger = SharpGL.RenderTrigger.TimerBased;
-            this.frameGL.Size = new System.Drawing.Size(680, 665);
+            this.frameGL.Size = new System.Drawing.Size(583, 577);
             this.frameGL.TabIndex = 0;
             // 
             // numMin
             // 
+            this.numMin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.numMin.ForeColor = System.Drawing.Color.White;
             this.numMin.Location = new System.Drawing.Point(714, 172);
             this.numMin.Maximum = new decimal(new int[] {
@@ -91,6 +92,7 @@ namespace EP
             // 
             // numMax
             // 
+            this.numMax.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.numMax.ForeColor = System.Drawing.Color.White;
             this.numMax.Location = new System.Drawing.Point(714, 108);
             this.numMax.Maximum = new decimal(new int[] {
@@ -142,6 +144,9 @@ namespace EP
             // 
             // cbObjects
             // 
+            this.cbObjects.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.cbObjects.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.cbObjects.ForeColor = System.Drawing.SystemColors.Window;
             this.cbObjects.FormattingEnabled = true;
             this.cbObjects.Location = new System.Drawing.Point(714, 46);
             this.cbObjects.Name = "cbObjects";
@@ -161,6 +166,7 @@ namespace EP
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(866, 605);
             this.Controls.Add(this.cbObjects);
             this.Controls.Add(this.rbBeams);

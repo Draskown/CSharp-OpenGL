@@ -1,7 +1,7 @@
 ﻿
-namespace EP
+namespace CSharpOpengl
 {
-    partial class EP_Form
+    partial class CSharpOpengl_Form
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@ namespace EP
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EP_Form));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CSharpOpengl_Form));
             this.frameGL = new SharpGL.OpenGLControl();
             this.numMin = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();

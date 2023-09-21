@@ -8,9 +8,9 @@ using System;
 using GlmNet;
 using System.IO;
 
-namespace EP
+namespace CSharpOpengl
 {
-    public partial class EP_Form : Form
+    public partial class CSharpOpengl_Form : Form
     {
         #region Initialization
 
@@ -42,7 +42,7 @@ namespace EP
 
         private bool currentSB;
 
-        public EP_Form()
+        public CSharpOpengl_Form()
         {
             InitializeComponent();
 

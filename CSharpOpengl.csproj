@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{4F502D74-D501-42C5-BD56-6E06DD029216}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>EP</RootNamespace>
-    <AssemblyName>EP</AssemblyName>
+    <RootNamespace>CSharpOpengl</RootNamespace>
+    <AssemblyName>CSharpOpengl</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -62,16 +62,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EP_Form.cs">
+    <Compile Include="CSharpOpengl_Form.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EP_Form.Designer.cs">
-      <DependentUpon>EP_Form.cs</DependentUpon>
+    <Compile Include="CSharpOpengl_Form.Designer.cs">
+      <DependentUpon>CSharpOpengl_Form.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="EP_Form.resx">
-      <DependentUpon>EP_Form.cs</DependentUpon>
+    <EmbeddedResource Include="CSharpOpengl_Form.resx">
+      <DependentUpon>CSharpOpengl_Form.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -81,9 +81,8 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="packages.config" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

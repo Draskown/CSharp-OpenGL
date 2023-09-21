@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31313.79
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EP", "EP.csproj", "{4F502D74-D501-42C5-BD56-6E06DD029216}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpOpengl", "CSharpOpengl.csproj", "{4F502D74-D501-42C5-BD56-6E06DD029216}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
